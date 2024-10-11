@@ -20,10 +20,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("users/", include("users.urls",
-                           namespace="users")),  # Подключаем отдельные маршруты для пользователей
-    path("habits/", include("habits.urls",
-                            namespace="habits")),  # Подключаем отдельные маршруты для пользователей
+    path("users/", include("users.urls", namespace="users")),  # Подключаем отдельные маршруты для пользователей
+    path("habits/", include("habits.urls", namespace="habits")),  # Подключаем отдельные маршруты для пользователей
     path("swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     path(
         "swagger/",

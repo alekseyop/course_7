@@ -14,6 +14,7 @@ class HabitPagination(PageNumberPagination):
     Параметры:
         - page_size (int): Количество привычек на одной странице (по умолчанию 5).
     """
+
     page_size = 5
 
 

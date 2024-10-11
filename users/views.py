@@ -26,6 +26,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     Доступ разрешен только для аутентифицированных пользователей.
     """
+
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
     permission_classes = [IsAuthenticated]  # Только авторизованные пользователи могут выполнять операции
@@ -37,6 +38,7 @@ class UsersCreateAPIView(CreateAPIView):
 
     Доступ открыт для всех пользователей (без необходимости авторизации).
     """
+
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
     permission_classes = [AllowAny]  # Доступ разрешен всем для регистрации новых пользователей

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Habit
 
+
 class HabitSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Habit.
@@ -29,6 +30,7 @@ class HabitSerializer(serializers.ModelSerializer):
     Исключения:
         - serializers.ValidationError: Возникает в случае, если данные не проходят валидацию.
     """
+
     class Meta:
         model = Habit
         fields = [
