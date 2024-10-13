@@ -163,7 +163,7 @@ class HabitAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Проверяем, что список содержит 1 привычку
-        self.assertEqual(Habit.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(len(response.json()), 1)
 
         # Проверяем, что данные в списке совпадают с ожидаемыми
         self.assertEqual(response.json()[0]["place"], "Park")

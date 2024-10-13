@@ -1,5 +1,6 @@
+from django.core.exceptions import ValidationError
 from requests import Response
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, permissions, status
 from .models import Habit
 from .serializers import HabitSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -7,6 +8,14 @@ from rest_framework.pagination import PageNumberPagination
 from .tasks import send_telegram_message
 
 
+class IsOwner(permissions.BasePermission):
+    """
+    Кастомное разрешение, позволяющее доступ только владельцам объекта.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Разрешение предоставляется только если пользователь является владельцем объекта
+        return obj.user == request.user
 class HabitPagination(PageNumberPagination):
     """
     Класс пагинации для привычек.
@@ -47,11 +56,12 @@ class HabitListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """
         Привязывает создаваемую привычку к текущему пользователю.
-
-        Args:
-            serializer (HabitSerializer): Сериализатор данных привычки.
+        Выполняет проверку на валидность перед сохранением.
         """
-        serializer.save(user=self.request.user)
+        try:
+            serializer.save(user=self.request.user)
+        except ValidationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -64,22 +74,26 @@ class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
         - DELETE: Удаляет привычку.
 
     Права доступа:
-        - Только аутентифицированные пользователи (IsAuthenticated).
-
-    Особенности:
-        - Ограничивает доступ только к привычкам, принадлежащим текущему пользователю.
+        - Только владелец привычки может получить доступ (IsAuthenticated + IsOwner).
     """
 
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]  # Добавляем проверку прав владельца
 
-    def get_queryset(self):
+    def get_permissions(self):
         """
-        Возвращает привычки, принадлежащие текущему аутентифицированному пользователю.
+        Возвращает права доступа для текущего запроса.
         """
-        return Habit.objects.filter(user=self.request.user)
+        return [permission() for permission in self.permission_classes]
 
+    def get_object(self):
+        """
+        Возвращает объект привычки, принадлежащий текущему пользователю.
+        """
+        obj = super().get_object()
+        self.check_object_permissions(self.request, obj)  # Проверяем права на уровне объекта
+        return obj
 
 class ReminderViewSet(viewsets.ViewSet):
     """
