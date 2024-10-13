@@ -143,20 +143,27 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_BEAT_SCHEDULE = {}
 
 CELERY_BEAT_SCHEDULE = {
     "block-inactive-users-every-day": {
         "task": "users.tasks.block_inactive_users",
-        "schedule": crontab(hour=13, minute=30),  # Задача будет запускаться каждый день в полночь
+        "schedule": crontab(hour=13, minute=30),  # Запуск каждый день в 13:30
         "options": {
-            "expires": 3600,  # Задача истекает через час, чтобы не запускалась с опозданием
+            "expires": 3600,
+        },
+    },
+    "send-daily-reminders": {
+        "task": "habits.tasks.send_daily_reminders",
+        "schedule": crontab(hour=8, minute=0),  # Напоминания каждый день в 8 утра
+        "options": {
+            "expires": 3600,
         },
     },
 }
 
 TELEGRAM_URL = "http://api.telegram.org/bot"
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",  # Замените на адрес вашего фронтенд-сервера
