@@ -33,7 +33,7 @@ class HabitAPITestCase(APITestCase):
         self.habit = Habit.objects.create(
             user=self.user,
             place="Park",
-            time="12:00",
+            time="12:00:00",
             action="Running",
             is_pleasant=False,
             periodicity=7,
@@ -147,6 +147,30 @@ class HabitAPITestCase(APITestCase):
         self.assertIn("periodicity", response.data)
         self.assertIn("execution_time", response.data)
 
+    # def test_get_habit_list(self):
+    #     """
+    #     Тестирует получение списка привычек пользователя.
+    #
+    #     Проверяется:
+    #         - Ответ API с кодом 200 (OK).
+    #         - Количество возвращенных привычек.
+    #         - Корректность возвращенных данных первой привычки в списке.
+    #     """
+    #     url = reverse("habits:habit-list-create")
+    #     response = self.client.get(url, format="json")
+    #
+    #     # Проверяем, что ответ имеет статус 200 (OK)
+    #     print("111111111111111111111")
+    #     print(response.json())
+    #     # Проверяем, что ответ имеет статус 200 (OK)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #
+    #     # Проверяем, что список содержит 1 привычку
+    #     # self.assertEqual(len(response.json()), 1)
+    #     self.assertEqual(len(response.json()['results']), 1)
+    #     # Проверяем, что данные в списке совпадают с ожидаемыми
+    #     self.assertEqual(response.json()[0]["place"], "Park")
+    #     self.assertEqual(response.json()[0]["action"], "Running")
     def test_get_habit_list(self):
         """
         Тестирует получение списка привычек пользователя.
@@ -159,12 +183,13 @@ class HabitAPITestCase(APITestCase):
         url = reverse("habits:habit-list-create")
         response = self.client.get(url, format="json")
 
+
         # Проверяем, что ответ имеет статус 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Проверяем, что список содержит 1 привычку
-        self.assertEqual(len(response.json()), 1)
+        # Проверяем, что в ответе содержится одна привычка
+        self.assertEqual(len(response.json()['results']), 1)
 
         # Проверяем, что данные в списке совпадают с ожидаемыми
-        self.assertEqual(response.json()[0]["place"], "Park")
-        self.assertEqual(response.json()[0]["action"], "Running")
+        self.assertEqual(response.json()['results'][0]["place"], "Park")
+        self.assertEqual(response.json()['results'][0]["action"], "Running")
