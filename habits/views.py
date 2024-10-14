@@ -16,6 +16,8 @@ class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Разрешение предоставляется только если пользователь является владельцем объекта
         return obj.user == request.user
+
+
 class HabitPagination(PageNumberPagination):
     """
     Класс пагинации для привычек.
@@ -94,6 +96,7 @@ class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
         obj = super().get_object()
         self.check_object_permissions(self.request, obj)  # Проверяем права на уровне объекта
         return obj
+
 
 class ReminderViewSet(viewsets.ViewSet):
     """
