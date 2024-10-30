@@ -60,11 +60,11 @@ class HabitListCreateView(generics.ListCreateAPIView):
         Привязывает создаваемую привычку к текущему пользователю.
         Выполняет проверку на валидность перед сохранением.
         """
-        try:
-            serializer.save(user=self.request.user)
-        except ValidationError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+        # try:
+        #     serializer.save(user=self.request.user)
+        # except ValidationError as e:
+        #     return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(user=self.request.user)
 
 class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -127,7 +127,7 @@ class ReminderViewSet(viewsets.ViewSet):
             Response: Ответ с подтверждением отправки напоминания.
         """
         habit = Habit.objects.get(id=habit_id, user=request.user)
-        chat_id = request.user.profile.telegram_chat_id  # предполагается, что есть поле в профиле
+        chat_id = request.user.profile.telegram_id  # предполагается, что есть поле в профиле
         send_telegram_message.delay(habit_id, chat_id)
         return Response({"status": "Напоминание отправлено!"})
 
