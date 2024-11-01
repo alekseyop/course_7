@@ -28,7 +28,7 @@ services:
   app:
     build: .
     tty: true
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -38,12 +38,26 @@ services:
     depends_on:
       db:
         condition: service_healthy
-        restart: true
+    restart: on-failure
 
   celery:
     build: .
     tty: true
-    command: celery -A config worker -B -l INFO
+    command: celery -A config worker -l INFO
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+      - app
+    env_file:
+      - ".env"
+
+  celery-beat:
+    build: .
+    tty: true
+    command: celery -A config beat -l INFO
     restart: on-failure
     volumes:
       - .:/app
